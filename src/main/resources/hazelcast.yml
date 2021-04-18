@@ -1,0 +1,68 @@
+hazelcast:
+  spring-aware: true
+  cluster-name: example-cluster
+  network:
+    port:
+      auto-increment: true
+      port-count: 100
+      port: 5701
+    join:
+      multicast:
+        enabled: false
+      tcp-ip:
+        enabled: true
+        members: 127.0.0.1:5701
+    interfaces:
+      enabled: true
+      interfaces:
+        - 127.0.0.1
+  map:
+    default:
+      in-memory-format: BINARY
+      cache-deserialized-values: INDEX-ONLY
+      backup-count: 1
+      async-backup-count: 0
+      time-to-live-seconds: 0
+      max-idle-seconds: 0
+      eviction:
+        eviction-policy: NONE
+      merge-policy:
+        class-name: PutIfAbsentMergePolicy
+      read-backup-data: false
+    spring:session:sessions:
+      in-memory-format: BINARY
+      per-entry-stats-enabled: true
+      cache-deserialized-values: INDEX-ONLY
+      backup-count: 0
+      async-backup-count: 1
+      time-to-live-seconds: 1800
+      max-idle-seconds: 1800
+      eviction:
+        eviction-policy: LRU
+        max-size-policy: FREE_HEAP_PERCENTAGE
+        size: 20
+      merge-policy:
+        class-name: LatestUpdateMergePolicy
+      read-backup-data: false
+    Setting:
+      in-memory-format: BINARY
+      per-entry-stats-enabled: true
+      cache-deserialized-values: INDEX-ONLY
+      backup-count: 0
+      async-backup-count: 0
+      time-to-live-seconds: 7200
+      max-idle-seconds: 3600
+      eviction:
+        eviction-policy: LRU
+        max-size-policy: FREE_HEAP_PERCENTAGE
+        size: 25
+      merge-policy:
+        class-name: LatestUpdateMergePolicy
+      read-backup-data: false
+      map-store:
+        enabled: true
+        initial-mode: LAZY
+        class-name: com.example.datastore.adapter.SettingStore
+        write-delay-seconds: 0
+        write-batch-size: 1000
+        write-coalescing: false
