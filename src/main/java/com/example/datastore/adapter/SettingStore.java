@@ -3,14 +3,14 @@ package com.example.datastore.adapter;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Properties;
 
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import com.example.datastore.service.SettingService;
-import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.map.MapLoaderLifecycleSupport;
 import com.hazelcast.map.MapStore;
 import com.hazelcast.map.PostProcessingMapStore;
 import com.hazelcast.spring.context.SpringAware;
@@ -18,26 +18,13 @@ import com.hazelcast.spring.context.SpringAware;
 /**
  * The class SettingStore.
  */
-@SpringAware
 @Component
-public final class SettingStore implements MapLoaderLifecycleSupport, MapStore<String, String>, PostProcessingMapStore {
+@SpringAware
+public final class SettingStore implements MapStore<String, String>, PostProcessingMapStore, ApplicationContextAware {
 
     /** The setting service. */
     @Autowired
     private SettingService settingService;
-
-    @Override
-    public void init(final HazelcastInstance hazelcastInstance, final Properties properties, final String mapName) {
-        hazelcastInstance
-            .getConfig()
-            .getManagedContext()
-            .initialize(this);
-    }
-
-    @Override
-    public void destroy() {
-        //
-    }
 
     /* (non-Javadoc)
      * @see com.hazelcast.core.MapStore#delete(java.lang.Object)
@@ -95,6 +82,11 @@ public final class SettingStore implements MapLoaderLifecycleSupport, MapStore<S
     @Override
     public void storeAll(final Map<String, String> map) {
         map.entrySet().forEach(entry -> settingService.writeValue(entry.getKey(), entry.getValue()));
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        settingService = applicationContext.getBean(SettingService.class);
     }
 
 }

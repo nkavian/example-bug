@@ -1,5 +1,6 @@
 package com.example.datastore.configuration;
 
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.session.MapSession;
@@ -8,6 +9,7 @@ import org.springframework.session.hazelcast.Hazelcast4PrincipalNameExtractor;
 import org.springframework.session.hazelcast.HazelcastSessionSerializer;
 import org.springframework.session.hazelcast.config.annotation.web.http.EnableHazelcastHttpSession;
 
+import com.example.datastore.adapter.SettingStore;
 import com.hazelcast.config.AttributeConfig;
 import com.hazelcast.config.ClasspathYamlConfig;
 import com.hazelcast.config.Config;
@@ -20,18 +22,21 @@ import com.hazelcast.spring.context.SpringManagedContext;
 @EnableHazelcastHttpSession
 public class HazelcastConfig {
 
+    
     @Bean
-    public SpringManagedContext managedContext() {
-        return new SpringManagedContext();
+    public SpringManagedContext managedContext(final ApplicationContext applicationContext) {
+        return new SpringManagedContext(applicationContext);
     }
 
     @Bean
-    public Config config(final SpringManagedContext context) {
+    public Config config(final SpringManagedContext managedContext, final SettingStore settingStore) {
         final Config config = new ClasspathYamlConfig("hazelcast.yml");
+
+        config.getMapConfig("Setting").getMapStoreConfig().setImplementation(settingStore);
 
         enableSessions(config);
 
-        config.setManagedContext(context);
+        config.setManagedContext(managedContext);
 
         return config;
     }
